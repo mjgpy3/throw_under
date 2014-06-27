@@ -16,6 +16,11 @@ class Configurator
     self
   end
 
+  def rabbit_url
+    rabbit = @config['rabbitmq']
+    "#{rabbit['protocol']}://#{rabbit['username']}:#{rabbit['password']}@#{rabbit['host']}:#{rabbit['port']}"
+  end
+
   def messages
     @config['messages']
   end

@@ -71,6 +71,17 @@ describe Configurator do
     end
  end
 
+  describe '#rabbit_url' do
+    subject { Configurator.new(file_name).rabbit_url }
+
+    context 'when the config specifies all the components of a rabbitmq URL' do
+      let(:rabbitmq) { { 'protocol' => 'amp', 'host' => 'locohost', 'username' => 'spameggs', 'password' => 'foobar', 'port' => '1234' } }
+      let(:text) { { 'rabbitmq' => rabbitmq } }
+
+      it { is_expected.to eq('amp://spameggs:foobar@locohost:1234') }
+    end
+  end
+
   describe '#validate' do
     subject { Configurator.new(file_name).validate }
 
