@@ -21,16 +21,16 @@ class Configurator
   def validate_messages
     return if messages.nil?
 
-    fail MUST_SPECIFY_TYPE if messages.any? { |m| !m.include?('type') }
-    outbound_queues = queues ? queues.
-      map { |q| q['outbound'] }.
-      select { |q| q } : []
+    fail MUST_SPECIFY_TYPE if any_messages_neglect_type?
+    fail LISTENERS_MUST_BE_QUEUES if any_listeners_are_not_outbound_queries?
+  end
 
-    listeners = messages.map { |m| m['listeners'] }.flatten.select { |q| q }
+  def any_messages_neglect_type?
+    messages.any? { |m| !m.include?('type') }
+  end
 
-    listeners.each do |listener|
-      fail LISTENERS_MUST_BE_QUEUES unless outbound_queues.include?(listener)
-    end
+  def any_listeners_are_not_outbound_queries?
+    listeners.any? { |l| !outbound_queues.include?(l) }
   end
 
   def validate_queues
@@ -39,6 +39,19 @@ class Configurator
     queues.each do |queue|
       fail error_for_missing(queue) if queue_missing?(queue)
     end
+  end
+
+  def outbound_queues
+    queues.
+      map { |q| q['outbound'] }.
+      select { |q| q }
+  end
+
+  def listeners
+    messages.
+      map { |m| m['listeners'] }.
+      flatten.
+      select { |q| q }
   end
 
   def queue_missing?(queue)

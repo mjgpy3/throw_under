@@ -104,6 +104,12 @@ describe Configurator do
 
       it { is_expected.to be_an_instance_of(Configurator) }
 
+      context 'and the config specifies a listener that is an outbound queue' do
+        let(:text) { YAML.dump(text_with_queues.merge('messages' => [{ 'type' => 'foo', 'listeners' => ['foo'] }])) }
+
+        it { is_expected.to be_an_instance_of(Configurator) }
+      end
+
       context 'and the config specifies a listener that is not an outbound queue' do
         let(:text) { YAML.dump(text_with_queues.merge('messages' => [{ 'type' => 'foo', 'listeners' => ['not_outbound'] }])) }
 
