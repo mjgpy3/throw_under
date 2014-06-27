@@ -5,7 +5,7 @@ def file_under_test
 end
 
 describe Configurator do
-  let(:text) { '' }
+  let(:text) { 'foo:' }
   let(:file_name) { 'config.tst.yaml' }
 
   before(:each) do
@@ -53,5 +53,80 @@ describe Configurator do
     subject { Configurator.new(file_name).validate }
 
     it { is_expected.to be_an_instance_of(Configurator) }
+
+    context 'when the config specifies a message without a type' do
+      let(:text) { YAML.dump('messages' => [{}]) }
+
+      it 'errors out because messages must have types' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_TYPE)
+      end
+    end
+
+    context 'when the config specifies two messages, but the second is without a type' do
+      let(:text) { YAML.dump('messages' => [{ 'type' => 'foo' }, {}]) }
+
+      it 'errors out because messages must have types' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_TYPE)
+      end
+    end
+
+    context 'when the config specifies two messages with types' do
+      let(:text) { YAML.dump('messages' => [{ 'type' => 'foo' }, { 'type' => 'bar'}]) }
+
+      it { is_expected.to be_an_instance_of(Configurator) }
+    end
+
+    context 'when the config specifies a message with a type' do
+      let(:text) { YAML.dump('messages' => [{ 'type' => 'foo' }]) }
+
+      it { is_expected.to be_an_instance_of(Configurator) }
+    end
+
+    context 'when the config specifies multiple queues, missing inbound' do
+      let(:text) { YAML.dump('queues' => [{ 'outbound' => 'foo', 'inbound' => 'bar' }, { 'outbound' => 'fizz' }] ) }
+
+      it 'errors out because inbound queues must be specified' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_INBOUND)
+      end
+    end
+
+    context 'when the config specifies multiple queues, missing outbound' do
+      let(:text) { YAML.dump('queues' => [{ 'outbound' => 'foo', 'inbound' => 'bar' }, { 'inbound' => 'fizz' }] ) }
+
+      it 'errors out because outbound queues must be specified' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_OUTBOUND)
+      end
+    end
+
+    context 'when the config specifies both inbound and outbound queues' do
+      let(:text_with_queues) { { 'queues' => [{ 'outbound' => 'foo', 'inbound' => 'bar' }] } }
+      let(:text) { YAML.dump(text_with_queues) }
+
+      it { is_expected.to be_an_instance_of(Configurator) }
+
+      context 'and the config specifies a listener that is not an outbound queue' do
+        let(:text) { YAML.dump(text_with_queues.merge('messages' => [{ 'type' => 'foo', 'listeners' => ['not_outbound'] }])) }
+
+        it 'errors out because all listeners must be outbound queues' do
+          expect { subject }.to raise_error(RuntimeError, Configurator::LISTENERS_MUST_BE_QUEUES)
+        end
+      end
+    end
+
+    context 'when the config\'s yaml has an outbound queue but not an inbound' do
+      let(:text) { YAML.dump('queues' => [{ 'outbound' => 'foo' }] ) }
+
+      it 'errors out because inbound queues must be specified' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_INBOUND)
+      end
+    end
+
+    context 'when the config\'s yaml has an inbound queue but not an outbound' do
+      let(:text) { YAML.dump('queues' => [{ 'inbound' => 'foo' }] ) }
+
+      it 'errors out because outbound queues must be specified' do
+        expect { subject }.to raise_error(RuntimeError, Configurator::MUST_SPECIFY_OUTBOUND)
+      end
+    end
   end
 end
