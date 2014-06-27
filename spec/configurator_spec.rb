@@ -16,8 +16,8 @@ describe Configurator do
 
     it { is_expected.to be_an_instance_of(Configurator) }
 
-    it 'reads the passed filename from ../config/' do
-      expect(File).to receive(:expand_path).with('../config/' + file_name, anything)
+    it 'reads the passed filename from ../../config/' do
+      expect(File).to receive(:expand_path).with('../../config/' + file_name, anything)
       subject
     end
 
@@ -36,6 +36,19 @@ describe Configurator do
         expect(YAML).to receive(:load_file).with(config_path)
         subject
       end
+    end
+  end
+
+  describe '#validate' do
+    let(:file_name) { 'config.yaml' }
+    subject { Configurator.new(file_name).validate }
+
+    context 'when a config file exists in the expected directory' do
+      before(:each) do
+        File.open(file_name, 'w') { |file| file.write('') }
+      end
+
+      it { is_expected.to be_an_instance_of(Configurator) }
     end
   end
 end
