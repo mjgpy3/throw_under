@@ -49,6 +49,21 @@ describe Configurator do
     end
   end
 
+  describe '#queues' do
+    subject { Configurator.new(file_name).queues }
+
+    context 'when the config specifies queues' do
+      let(:queues) { [{'...' => '...' }, { '...' => '...' }] }
+      let(:text) { { 'queues' => queues } }
+
+      it { is_expected.to eq(queues) }
+    end
+  end
+
+  describe '#messages' do
+    subject { Configurator.new(file_name).messages }
+  end
+
   describe '#validate' do
     subject { Configurator.new(file_name).validate }
 
