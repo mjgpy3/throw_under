@@ -16,6 +16,10 @@ class Configurator
     self
   end
 
+  def messages
+    @config['messages']
+  end
+
   def queues
     @config['queues']
   end
@@ -64,10 +68,6 @@ class Configurator
 
   def error_for_missing(queue)
     queue['inbound'].nil? ? MUST_SPECIFY_INBOUND : MUST_SPECIFY_OUTBOUND
-  end
-
-  def messages
-    @config['messages']
   end
 
 end

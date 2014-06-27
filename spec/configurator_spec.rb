@@ -62,7 +62,14 @@ describe Configurator do
 
   describe '#messages' do
     subject { Configurator.new(file_name).messages }
-  end
+
+    context 'when the config specifies messages' do
+      let(:messages) { [{'...' => '...' }, { '...' => '...' }] }
+      let(:text) { { 'messages' => messages } }
+
+      it { is_expected.to eq(messages) }
+    end
+ end
 
   describe '#validate' do
     subject { Configurator.new(file_name).validate }
