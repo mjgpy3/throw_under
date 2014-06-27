@@ -5,6 +5,16 @@ def file_under_test
 end
 
 describe Configurator do
+  let(:text) { '' }
+  let(:file_name) { 'config.tst.yaml' }
+
+  before(:each) do
+    File.open('./config/config.tst.yaml', 'w') { |file| file.write(text) }
+  end
+
+  after(:each) do
+    File.delete('./config/config.tst.yaml')
+  end
 
   describe '#initialize' do
     before(:each) do
@@ -40,15 +50,8 @@ describe Configurator do
   end
 
   describe '#validate' do
-    let(:file_name) { 'config.yaml' }
     subject { Configurator.new(file_name).validate }
 
-    context 'when a config file exists in the expected directory' do
-      before(:each) do
-        File.open(file_name, 'w') { |file| file.write('') }
-      end
-
-      it { is_expected.to be_an_instance_of(Configurator) }
-    end
+    it { is_expected.to be_an_instance_of(Configurator) }
   end
 end
