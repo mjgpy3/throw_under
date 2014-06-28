@@ -3,8 +3,10 @@ require 'bunny'
 
 describe QueueBinder do
 
+  let(:connection) { double('connection').as_null_object }
+
   before(:each) do
-    allow(Bunny).to receive(:new)
+    allow(Bunny).to receive(:new).and_return(connection)
   end
 
   describe '#initialize' do
@@ -17,6 +19,16 @@ describe QueueBinder do
 
       it 'creates a new connection using the Configurator\'s rabbit url' do
         expect(Bunny).to receive(:new).with(configurator.rabbit_url)
+        subject
+      end
+
+      it 'starts that new connection' do
+        expect(connection).to receive(:start)
+        subject
+      end
+
+      it 'creates a new channel using that new connection' do
+        expect(connection).to receive(:create_channel)
         subject
       end
     end

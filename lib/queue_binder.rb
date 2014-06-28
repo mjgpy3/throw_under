@@ -1,7 +1,8 @@
 class QueueBinder
 
   def initialize(configurator)
-    Bunny.new(configurator.rabbit_url)
+    connection = Bunny.new(configurator.rabbit_url)
+    connection.start.create_channel
   end
 
 end
