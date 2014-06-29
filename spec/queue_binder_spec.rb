@@ -4,9 +4,11 @@ require 'bunny'
 describe QueueBinder do
 
   let(:connection) { double('connection').as_null_object }
+  let(:channel) { double('channel').as_null_object }
 
   before(:each) do
     allow(Bunny).to receive(:new).and_return(connection)
+    allow(connection).to receive(:create_channel).and_return(channel)
   end
 
   describe '#initialize' do
@@ -29,6 +31,16 @@ describe QueueBinder do
 
       it 'creates a new channel using that new connection' do
         expect(connection).to receive(:create_channel)
+        subject
+      end
+
+      it 'creates a new fanout using that new channel' do
+        expect(channel).to receive(:fanout)
+        subject
+      end
+
+      it 'creates a new fanout, binding it to the ".route_me" suffix' do
+        expect(channel).to receive(:fanout).with('#.route_me')
         subject
       end
     end
