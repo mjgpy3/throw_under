@@ -23,16 +23,10 @@ class Configurator
     "#{rabbit['protocol']}://#{rabbit['username']}:#{rabbit['password']}@#{rabbit['host']}:#{rabbit['port']}"
   end
 
-  def messages
-    @config['messages']
-  end
-
-  def queues
-    @config['queues']
-  end
-
-  def routing_suffix
-    @config['routing_suffix']
+  ['messages', 'queues', 'routing_suffix'].each do |config_value|
+    define_method(config_value) do
+      @config[config_value]
+    end
   end
 
   private
