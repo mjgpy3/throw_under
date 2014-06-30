@@ -15,7 +15,7 @@ describe QueueBinder do
     subject { QueueBinder.new(configurator) }
 
     context 'when given a Configurator' do
-      let(:configurator) { double('Configurator', rabbit_url: 'some_url...') }
+      let(:configurator) { double('Configurator', rabbit_url: 'some_url...', routing_suffix: 'foobar') }
 
       it { is_expected.to be_instance_of(QueueBinder) }
 
@@ -39,8 +39,8 @@ describe QueueBinder do
         subject
       end
 
-      it 'creates a new fanout, binding it to the ".route_me" suffix' do
-        expect(channel).to receive(:fanout).with('#.route_me')
+      it 'creates a new fanout, binding it to the routing suffix' do
+        expect(channel).to receive(:fanout).with(configurator.routing_suffix)
         subject
       end
     end
