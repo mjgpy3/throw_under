@@ -3,7 +3,7 @@ class Configurator
   MUST_SPECIFY_OUTBOUND = 'Must specify outbound queue for each inbound'
   MUST_SPECIFY_INBOUND = 'Must specify inbound queue for each outbound'
   MUST_SPECIFY_TYPE = 'Messages must each have a type'
-  INBOUND_SUFFIX_MISSING = 'Inbound queues must have a ".route_me" suffix'
+  MISSING_ROUTING_SUFFIX = 'Must specify a routing suffix'
   LISTENERS_MUST_BE_QUEUES = 'All listeners must be outbound queues'
 
   def initialize(file_name)
@@ -12,6 +12,7 @@ class Configurator
   end
 
   def validate
+    validate_routing_suffix
     validate_queues
     validate_messages
     self
@@ -31,6 +32,10 @@ class Configurator
   end
 
   private
+
+  def validate_routing_suffix
+    fail MISSING_ROUTING_SUFFIX unless @config.include?('routing_suffix')
+  end
 
   def validate_messages
     return if messages.nil?
@@ -52,7 +57,6 @@ class Configurator
 
     queues.each do |queue|
       fail error_for_missing(queue) if queue_missing?(queue)
-      fail INBOUND_SUFFIX_MISSING unless has_inbound_suffix?(queue)
     end
   end
 
