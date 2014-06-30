@@ -7,7 +7,10 @@ class QueueBinder
   end
 
   def bind_queues
-    @channel.queue('throw_under', auto_delete: true).bind(@fanout)
+    @channel.
+      queue('throw_under', auto_delete: true).
+      bind(@fanout).
+      subscribe
   end
 
 end

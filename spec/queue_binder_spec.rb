@@ -62,6 +62,14 @@ describe QueueBinder do
           expect(queue).to receive(:bind).with(fanout)
           subject
         end
+
+        it 'subscribes, delegating to another method' do
+          expect(queue).to receive(:subscribe)
+          subject
+        end
+
+        context 'and given a message type that it knows about' do
+        end
       end
     end
   end
