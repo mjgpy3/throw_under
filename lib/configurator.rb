@@ -31,6 +31,10 @@ class Configurator
     @config['queues']
   end
 
+  def routing_suffix
+    @config['routing_suffix']
+  end
+
   private
 
   def validate_routing_suffix

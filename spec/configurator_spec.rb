@@ -83,6 +83,16 @@ describe Configurator do
     end
   end
 
+  describe '#routing_suffix' do
+    subject { Configurator.new(file_name).routing_suffix }
+
+    context 'when the config specifies a routing suffix' do
+      let(:config) { { 'routing_suffix' => 'foobar' } }
+
+      it { is_expected.to eq('foobar') }
+    end
+  end
+
   describe '#validate' do
     subject { Configurator.new(file_name).validate }
 
