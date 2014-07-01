@@ -5,8 +5,7 @@ describe QueueBinder do
 
   let(:connection) { double('connection').as_null_object }
   let(:queue) { double('queue').as_null_object }
-  let(:fanout) { double('fanout').as_null_object }
-  let(:channel) { double('channel', queue: queue, fanout: fanout).as_null_object }
+  let(:channel) { double('channel', queue: queue).as_null_object }
 
   before(:each) do
     allow(Bunny).to receive(:new).and_return(connection)
@@ -36,13 +35,8 @@ describe QueueBinder do
         subject
       end
 
-      it 'creates a new fanout using that new channel' do
-        expect(channel).to receive(:fanout)
-        subject
-      end
-
-      it 'creates a new fanout, binding it to the routing suffix, with a wildcard catch' do
-        expect(channel).to receive(:fanout).with("#.#{configurator.routing_suffix}")
+      it 'creates a new queue using that new channel' do
+        expect(channel).to receive(:queue).with("#.#{configurator.routing_suffix}")
         subject
       end
     end
@@ -53,22 +47,22 @@ describe QueueBinder do
       context 'when given a Configurator' do
         let(:configurator) { double('Configurator', rabbit_url: 'some_url...', routing_suffix: 'foobar') }
 
-        it 'creates a queue using the channel, giving it a name and an autodelete option' do
-          expect(channel).to receive(:queue).with('throw_under', auto_delete: true)
-          subject
-        end
-
-        it 'binds that queue to the fanout exchange' do
-          expect(queue).to receive(:bind).with(fanout)
-          subject
-        end
-
-        it 'subscribes, delegating to another method' do
+        it 'subscribes' do
           expect(queue).to receive(:subscribe)
           subject
         end
 
-        context 'and given a message type that it knows about' do
+        context 'and given a Publisher' do
+          subject { QueueBinder.new(configurator, publisher).bind_queues }
+          let(:publisher) { double('Publisher').as_null_object }
+
+          context 'and queues have been bound' do
+            before(:each) { subject.bind_queues }
+
+            context 'and a message comes through' do
+
+            end
+          end
         end
       end
     end
